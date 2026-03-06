@@ -1,33 +1,26 @@
-
 const express = require('express');
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const pool = new Pool({
-        user:'appuser',
-host:'localhost',
-database:'myapp',
-password:'apppassword',
-port:5432,
+  connectionString: process.env.DATABASE_URL,
 });
 
-app.get('/',(req,res)=>{
-        res.send('API is running!')
-})
+app.get('/', (req, res) => {
+  res.send('Aetheria API is running!')
+});
 
-app.get('/users',async(req,res)=>{
-        try{
-        const result = await pool.query('SELECT * FROM users');
-        res.json(result.rows);
-}catch(err){
-        console.log(err);
-        res.status(500).json({error:'Database error'})
-}
-})
+app.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    res.status(500).json({ status: 'error', db: err.message });
+  }
+});
 
-
-app.listen(PORT,()=>{
-        console.log(`Server is running on port ${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

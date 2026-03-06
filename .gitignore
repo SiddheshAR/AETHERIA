@@ -1,8 +1,20 @@
-node_modules/
-client/node_modules/
-server/node_modules/
+# Secrets — NEVER commit this
 .env
-client/.env
-server/.env
+.env.local
+
+# Node
+node_modules/
 dist/
-client/dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+postgres_data/
+redis_data/
