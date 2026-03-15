@@ -40,6 +40,24 @@ services:
     networks:
       - aetheria_net
 
+  flyway:
+    image: flyway/flyway:10-alpine
+    container_name: aetheria_flyway
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      -url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      -user=${POSTGRES_USER}
+      -password=${POSTGRES_PASSWORD}
+      -locations=filesystem:/flyway/sql
+      -connectRetries=5
+      migrate
+    volumes:
+      - ./packages/db/migrations:/flyway/sql:ro
+    networks:
+      - aetheria_net
+
   backend:
     build:
       context: ./server
@@ -51,6 +69,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     environment:
       NODE_ENV: development
       PORT: 3000
